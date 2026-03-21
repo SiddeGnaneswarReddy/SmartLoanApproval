@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusFi | Model Architecture</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* CORE THEME STYLES */
+        :root { --primary: #818cf8; --text-muted: #94a3b8; --glass-border: rgba(255, 255, 255, 0.08); }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Inter', sans-serif; color: #f8fafc; display: flex; height: 100vh; overflow: hidden; background: linear-gradient(-45deg, #0b1120, #1e1b4b, #0f172a, #172554); background-size: 400% 400%; animation: gradientMove 20s ease infinite; }
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* SIDEBAR (Match index.html) */
+        .sidebar { width: 280px; background: rgba(2, 6, 23, 0.6); backdrop-filter: blur(20px); display: flex; flex-direction: column; border-right: 1px solid var(--glass-border); }
+        .brand { padding: 24px; font-size: 22px; font-weight: 800; color: white; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--glass-border); }
+        .nav-menu { padding: 20px 0; display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
+        .nav-item { padding: 14px 24px; display: flex; align-items: center; gap: 15px; cursor: pointer; font-weight: 500; font-size: 14px; color: var(--text-muted); transition: all 0.3s; text-decoration: none; }
+        .nav-item:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-item.active { background-color: rgba(99, 102, 241, 0.15); color: #818cf8; border-right: 4px solid #818cf8; }
+
+        /* CONTENT */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .topbar { height: 70px; background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; padding: 0 40px; }
+        .content { padding: 40px; width: 100%; max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
+
+        /* ARCHITECTURE CARDS */
+        .arch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .card { background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(20px); border-radius: 16px; border: 1px solid var(--glass-border); padding: 30px; }
+        .card h3 { margin: 0 0 15px 0; color: #818cf8; display: flex; align-items: center; gap: 10px; }
+        .card p { color: #cbd5e1; font-size: 14px; line-height: 1.6; }
+        
+        .tech-pill { display: inline-block; padding: 4px 12px; background: rgba(129, 140, 248, 0.1); color: #818cf8; border-radius: 4px; font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand"><i class="fa-solid fa-layer-group"></i> <span>NexusFi AI</span></div>
+        <div class="nav-menu">
+            <a href="/" class="nav-item"><i class="fa-solid fa-file-signature"></i> <span>New Assessment</span></a>
+            <a href="/history" class="nav-item"><i class="fa-solid fa-database"></i> <span>Historical Data</span></a>
+            <a href="/architecture" class="nav-item active"><i class="fa-solid fa-network-wired"></i> <span>Model Architecture</span></a>
+        </div>
+    </aside>
+
+    <main class="main-wrapper">
+        <header class="topbar"><h1 style="font-size: 18px; margin: 0;">System Architecture & ML Pipeline</h1></header>
+
+        <div class="content">
+            <div class="card">
+                <div class="tech-pill">ALGORITHM</div>
+                <h3><i class="fa-solid fa-tree"></i> Random Forest Classifier</h3>
+                <p>The core engine uses an ensemble learning method. Instead of relying on one "Decision Tree," it creates a forest of multiple trees and takes the majority vote. This prevents "overfitting" and makes our loan predictions highly accurate.</p>
+                
+
+[Image of random forest algorithm diagram]
+
+            </div>
+
+            <div class="arch-grid">
+                <div class="card">
+                    <h3><i class="fa-solid fa-gears"></i> Feature Engineering</h3>
+                    <p>We process 11 features including Applicant Income, Credit History, and Property Area. Categorical data is transformed using <strong>Label Encoding</strong> to convert text into machine-readable numbers.</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fa-solid fa-database"></i> SQLite Persistence</h3>
+                    <p>The application is full-stack. Every prediction made is captured in a <strong>SQL database</strong> via SQLAlchemy, allowing for audit trails and historical performance tracking.</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fa-solid fa-flask"></i> Flask Backend</h3>
+                    <p>A lightweight Python WSGI server handles the routing, connecting the Scikit-Learn model to the frontend User Interface in real-time.</p>
+                </div>
+            </div>
+
+            <div class="card" style="text-align: center;">
+                <h3>The Prediction Pipeline</h3>
+                <p>Input Data → Label Encoding → Random Forest Voting → Softmax Probability → UI Visualization</p>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

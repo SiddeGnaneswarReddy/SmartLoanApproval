@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusFi | Historical Ledger</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            var(--glass-bg): rgba(15, 23, 42, 0.4);
+            var(--glass-border): rgba(255, 255, 255, 0.08);
+            var(--glass-highlight): rgba(255, 255, 255, 0.12);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            color: #f8fafc;
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            
+            /* The Animated Moving Background */
+            background: linear-gradient(-45deg, #0b1120, #1e1b4b, #0f172a, #172554, #020617);
+            background-size: 400% 400%;
+            animation: gradientMove 20s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 280px;
+            background: rgba(2, 6, 23, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 10;
+        }
+
+        .brand {
+            padding: 24px;
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            letter-spacing: -0.5px;
+        }
+
+        .brand i { color: #818cf8; font-size: 24px; }
+
+        .nav-menu { padding: 20px 0; display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
+
+        .nav-item {
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            color: #94a3b8;
+            transition: all 0.3s;
+            text-decoration: none; 
+        }
+
+        .nav-item:hover { background-color: rgba(255, 255, 255, 0.12); color: white; }
+        .nav-item.active { 
+            background-color: rgba(99, 102, 241, 0.15); 
+            color: #818cf8; 
+            border-right: 4px solid #818cf8; 
+            font-weight: 600;
+        }
+
+        /* Developer Profile Card */
+        .dev-profile {
+            margin: 20px;
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .dev-header { display: flex; align-items: center; gap: 12px; }
+        .dev-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #38bdf8, #6366f1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4); }
+        .dev-info h4 { margin: 0; color: white; font-size: 14px; }
+        .dev-info p { margin: 2px 0 0 0; font-size: 12px; color: #94a3b8; }
+
+        /* --- MAIN CONTENT AREA --- */
+        .main-wrapper { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-y: auto; 
+        }
+
+        /* Top Header */
+        .topbar {
+            height: 70px; 
+            background: rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 40px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 5;
+        }
+        
+        .page-title { font-size: 18px; font-weight: 600; margin: 0; color: white;}
+        .status-pill { background: rgba(56, 189, 248, 0.1); color: #38bdf8; padding: 6px 14px; border-radius: 50px; border: 1px solid rgba(56, 189, 248, 0.2); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 10px rgba(56, 189, 248, 0.1); }
+
+        /* Dashboard Content */
+        .content { 
+            padding: 40px; 
+            width: 100%; 
+            max-width: 1800px; 
+            margin: 0 auto; 
+        }
+
+        /* Glass Card for Table */
+        .card { 
+            background: rgba(15, 23, 42, 0.5); 
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 16px; 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5); 
+            overflow: hidden; 
+        }
+        .card-header { padding: 24px 32px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255,255,255,0.02); }
+        .card-header h3 { margin: 0; font-size: 18px; font-weight: 600; color: white; display: flex; align-items: center; gap: 12px; }
+        
+        /* Sleek Enterprise Table */
+        .table-container { width: 100%; overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; text-align: left; }
+        
+        .data-table th { 
+            padding: 20px 32px; 
+            background: rgba(0, 0, 0, 0.2); 
+            font-size: 12px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            color: #94a3b8; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+        }
+        
+        .data-table td { 
+            padding: 20px 32px; 
+            font-size: 14px; 
+            color: #e2e8f0; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03); 
+            font-weight: 500;
+        }
+        
+        .data-table tbody tr { transition: background-color 0.2s; }
+        .data-table tbody tr:hover { background: rgba(99, 102, 241, 0.1); }
+
+        /* Result Badges */
+        .badge { 
+            padding: 6px 14px; 
+            border-radius: 50px; 
+            font-size: 12px; 
+            font-weight: 700; 
+            letter-spacing: 0.5px; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+        }
+        .badge.approved { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge.denied { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        .confidence-text { color: #818cf8; font-weight: 700; }
+
+        @media (max-width: 1200px) { .sidebar { width: 80px; } .brand span, .nav-item span, .dev-profile { display: none; } .nav-item i { margin: 0 auto; font-size: 20px;} }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand"><i class="fa-solid fa-layer-group"></i> <span>NexusFi AI</span></div>
+        
+        <div class="nav-menu">
+            <a href="/" class="nav-item"><i class="fa-solid fa-file-signature"></i> <span>New Assessment</span></a>
+            <a href="/history" class="nav-item active"><i class="fa-solid fa-database"></i> <span>Historical Data</span></a>
+            <a href="/architecture" class="nav-item"><i class="fa-solid fa-network-wired"></i> <span>Model Architecture</span></a>
+        </div>
+
+        <div class="dev-profile">
+            <div class="dev-header">
+                <div class="dev-avatar">SR</div>
+                <div class="dev-info">
+                    <h4>Sidde Reddy</h4>
+                    <p>Machine Learning Engineer</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-wrapper">
+        
+        <header class="topbar">
+            <h1 class="page-title">Smart Loan Approval System</h1>
+            <div class="status-pill"><i class="fa-solid fa-server"></i> Database: Connected</div>
+        </header>
+
+        <div class="content">
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fa-solid fa-table-list" style="color: #818cf8;"></i> Live Underwriting Ledger</h3>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Total Income</th>
+                                <th>Requested Loan</th>
+                                <th>Credit History</th>
+                                <th>AI Confidence</th>
+                                <th>Final Decision</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in records %}
+                            <tr>
+                                <td style="color: #94a3b8;"><i class="fa-regular fa-clock" style="margin-right: 8px;"></i> {{ record.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>${{ "{:,.0f}".format(record.income) }}</td>
+                                <td style="font-weight: 700; color: white;">${{ "{:,.0f}".format(record.loan_amount) }}k</td>
+                                <td>{{ record.credit_history }}</td>
+                                <td class="confidence-text">{{ record.confidence }}%</td>
+                                <td>
+                                    {% if record.result == 'APPROVED' %}
+                                        <span class="badge approved"><i class="fa-solid fa-check"></i> APPROVED</span>
+                                    {% else %}
+                                        <span class="badge denied"><i class="fa-solid fa-xmark"></i> DENIED</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 60px; color: #64748b; font-size: 15px;">
+                                    <i class="fa-solid fa-folder-open" style="font-size: 40px; margin-bottom: 15px; opacity: 0.5; display: block;"></i>
+                                    No historical data found. Run an assessment on the main dashboard to populate the database.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusFi | AI Underwriting</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            /* Glassmorphism & Dark Mode Variables */
+            --glass-bg: rgba(15, 23, 42, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.12);
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            
+            /* The Animated Moving Background */
+            background: linear-gradient(-45deg, #0b1120, #1e1b4b, #0f172a, #172554, #020617);
+            background-size: 400% 400%;
+            animation: gradientMove 20s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 280px;
+            background: rgba(2, 6, 23, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--glass-border);
+            z-index: 10;
+        }
+
+        .brand {
+            padding: 24px;
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--glass-border);
+            letter-spacing: -0.5px;
+        }
+
+        .brand i { color: #818cf8; font-size: 24px; }
+
+        .nav-menu { padding: 20px 0; display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
+
+        /* UPDATED: Added text-decoration: none so the links don't have blue underlines */
+        .nav-item {
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-muted);
+            transition: all 0.3s;
+            text-decoration: none; 
+        }
+
+        .nav-item:hover { background-color: var(--glass-highlight); color: white; }
+        .nav-item.active { 
+            background-color: rgba(99, 102, 241, 0.15); 
+            color: #818cf8; 
+            border-right: 4px solid #818cf8; 
+            font-weight: 600;
+        }
+
+        /* Developer Profile Card */
+        .dev-profile {
+            margin: 20px;
+            padding: 15px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .dev-header { display: flex; align-items: center; gap: 12px; }
+        .dev-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #38bdf8, #6366f1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4); }
+        .dev-info h4 { margin: 0; color: white; font-size: 14px; }
+        .dev-info p { margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted); }
+        .dev-links { display: flex; gap: 15px; margin-top: 5px; padding-top: 10px; border-top: 1px solid var(--glass-border); justify-content: space-around; }
+        .dev-links a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; font-size: 16px; }
+        .dev-links a:hover { color: white; transform: scale(1.1); }
+
+        /* --- MAIN CONTENT AREA --- */
+        .main-wrapper { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-y: auto; 
+            position: relative;
+        }
+
+        /* Top Header */
+        .topbar {
+            height: 70px; 
+            background: rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 40px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 5;
+        }
+        
+        .page-title { font-size: 18px; font-weight: 600; margin: 0; }
+        .status-pill { background: rgba(16, 185, 129, 0.1); color: #34d399; padding: 6px 14px; border-radius: 50px; border: 1px solid rgba(16, 185, 129, 0.2); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.1); }
+        .status-pill i { font-size: 8px; animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        /* Dashboard Content (Expanded to Fill Page) */
+        .content { 
+            padding: 40px; 
+            width: 100%; 
+            max-width: 1800px; 
+            margin: 0 auto; 
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* Project Context Banner */
+        .project-brief {
+            background: var(--glass-bg); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 24px 32px; 
+            border-radius: 16px; 
+            border: 1px solid var(--glass-border); 
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); 
+            display: flex; 
+            gap: 24px; 
+            align-items: center;
+        }
+        .brief-icon { width: 65px; height: 65px; background: rgba(99, 102, 241, 0.15); color: #818cf8; border-radius: 16px; border: 1px solid rgba(99, 102, 241, 0.3); display: flex; align-items: center; justify-content: center; font-size: 30px; flex-shrink: 0; }
+        .brief-text h2 { margin: 0 0 8px 0; font-size: 22px; font-weight: 700; color: white; }
+        .brief-text p { margin: 0; color: #cbd5e1; font-size: 15px; line-height: 1.6; }
+
+        /* Main App Grid */
+        .app-grid { 
+            display: grid; 
+            grid-template-columns: 1.8fr 1fr; 
+            gap: 30px; 
+            align-items: start; 
+        }
+
+        /* Glass Cards */
+        .card { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px; 
+            border: 1px solid var(--glass-border); 
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.4); 
+            overflow: hidden; 
+        }
+        .card-header { padding: 24px 32px; border-bottom: 1px solid var(--glass-border); background: rgba(255,255,255,0.02); }
+        .card-header h3 { margin: 0; font-size: 18px; font-weight: 600; color: white; display: flex; align-items: center; gap: 12px; }
+        .card-body { padding: 32px; }
+
+        /* Form Styling */
+        .form-section-title { font-size: 13px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 20px 0; grid-column: span 2; display: flex; align-items: center; gap: 12px;}
+        .form-section-title::after { content: ""; flex: 1; height: 1px; background: var(--glass-border); }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 35px; }
+        
+        .input-group { display: flex; flex-direction: column; }
+        .input-group label { font-size: 13px; font-weight: 600; margin-bottom: 10px; color: #cbd5e1; }
+        
+        input, select {
+            padding: 14px 18px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 10px; 
+            font-family: 'Inter', sans-serif; 
+            font-size: 15px; 
+            background-color: rgba(15, 23, 42, 0.6); 
+            color: white; 
+            transition: all 0.3s ease;
+        }
+        select option { background-color: #0f172a; color: white; }
+        input:focus, select:focus { outline: none; border-color: #818cf8; background-color: rgba(15, 23, 42, 0.9); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2); }
+
+        .submit-btn {
+            width: 100%; padding: 18px; background: linear-gradient(135deg, var(--primary), #3b82f6); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; justify-content: center; align-items: center; gap: 12px; box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.5); letter-spacing: 0.5px;
+        }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(99, 102, 241, 0.6); }
+
+        /* Results Panel */
+        .results-container { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px;}
+        
+        .status-badge { display: inline-flex; align-items: center; justify-content: center; padding: 14px 35px; border-radius: 50px; font-weight: 800; font-size: 20px; letter-spacing: 1px; margin-bottom: 35px; gap: 12px; }
+        
+        .chart-wrapper { position: relative; width: 260px; height: 260px; margin: 0 auto 30px auto; }
+        
+        .chart-center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; line-height: 1; }
+        .chart-center-text h2 { margin: 0; font-size: 48px; font-weight: 800; color: white; }
+        .chart-center-text span { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 1px;}
+        
+        .empty-state { padding: 40px 20px; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .empty-state i { font-size: 55px; color: rgba(255,255,255,0.1); margin-bottom: 10px;}
+
+        @media (max-width: 1200px) { .app-grid { grid-template-columns: 1fr; } .sidebar { width: 80px; } .brand span, .nav-item span, .dev-profile { display: none; } .nav-item i { margin: 0 auto; font-size: 20px;} }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand"><i class="fa-solid fa-layer-group"></i> <span>NexusFi AI</span></div>
+        
+        <div class="nav-menu">
+            <a href="/" class="nav-item active"><i class="fa-solid fa-file-signature"></i> <span>New Assessment</span></a>
+            <a href="/history" class="nav-item"><i class="fa-solid fa-database"></i> <span>Historical Data</span></a>
+            <a href="/architecture" class="nav-item"><i class="fa-solid fa-network-wired"></i> <span>Model Architecture</span></a>
+        </div>
+
+        <div class="dev-profile">
+            <div class="dev-header">
+                <div class="dev-avatar">SR</div>
+                <div class="dev-info">
+                    <h4>Sidde Reddy</h4>
+                    <p>Machine Learning Engineer</p>
+                </div>
+            </div>
+            <div class="dev-links">
+                <a href="#" title="GitHub"><i class="fa-brands fa-github"></i></a>
+                <a href="#" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#" title="Portfolio"><i class="fa-solid fa-globe"></i></a>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-wrapper">
+        
+        <header class="topbar">
+            <h1 class="page-title">Smart Loan Approval System</h1>
+            <div class="status-pill"><i class="fa-solid fa-circle"></i> AI Engine: Online</div>
+        </header>
+
+        <div class="content">
+            
+            <div class="project-brief">
+                <div class="brief-icon"><i class="fa-solid fa-brain"></i></div>
+                <div class="brief-text">
+                    <h2>Predictive Risk Modeling for FinTech</h2>
+                    <p>This application utilizes a <strong>Random Forest Machine Learning Algorithm</strong> trained on historical banking data. By processing 11 distinct demographic and financial data points, the model predicts the probability of a loan default, allowing for instant, data-driven underwriting decisions.</p>
+                </div>
+            </div>
+
+            <div class="app-grid">
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-sliders" style="color: #818cf8;"></i> Configure Applicant Parameters</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="/predict" method="post">
+                            
+                            <div class="form-section-title"><i class="fa-solid fa-id-card"></i> Demographics</div>
+                            <div class="form-grid">
+                                <div class="input-group"><label>Gender</label><select name="Gender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                                <div class="input-group"><label>Marital Status</label><select name="Married"><option value="Yes">Married</option><option value="No">Single</option></select></div>
+                                <div class="input-group"><label>Dependents</label><select name="Dependents"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3+">3+</option></select></div>
+                                <div class="input-group"><label>Education Level</label><select name="Education"><option value="Graduate">Graduate</option><option value="Not Graduate">Not Graduate</option></select></div>
+                            </div>
+
+                            <div class="form-section-title"><i class="fa-solid fa-building-columns"></i> Financials</div>
+                            <div class="form-grid">
+                                <div class="input-group"><label>Self Employed</label><select name="Self_Employed"><option value="No">No</option><option value="Yes">Yes</option></select></div>
+                                <div class="input-group"><label>Applicant Income ($/mo)</label><input type="number" name="ApplicantIncome" required placeholder="e.g. 5000"></div>
+                                <div class="input-group"><label>Co-Applicant Income ($/mo)</label><input type="number" name="CoapplicantIncome" required value="0"></div>
+                                <div class="input-group"><label>Loan Amount Request ($k)</label><input type="number" name="LoanAmount" required placeholder="e.g. 150"></div>
+                            </div>
+
+                            <div class="form-section-title"><i class="fa-solid fa-file-contract"></i> Credit & Terms</div>
+                            <div class="form-grid">
+                                <div class="input-group"><label>Loan Term (Months)</label><input type="number" name="Loan_Amount_Term" required value="360"></div>
+                                <div class="input-group"><label>Credit History</label><select name="Credit_History"><option value="1.0">1.0 - Good Standing</option><option value="0.0">0.0 - Bad/Defaulted</option></select></div>
+                                <div class="input-group" style="grid-column: span 2;"><label>Property Area</label><select name="Property_Area"><option value="Urban">Urban</option><option value="Semiurban">Semiurban</option><option value="Rural">Rural</option></select></div>
+                            </div>
+
+                            <button type="submit" class="submit-btn"><i class="fa-solid fa-bolt"></i> Execute AI Risk Analysis</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-chart-line" style="color: #818cf8;"></i> Algorithmic Output</h3>
+                    </div>
+                    <div class="card-body results-container">
+                        
+                        {% if prediction_text %}
+                            
+                            <div class="status-badge" style="background: {{ color }}20; color: {{ color }}; border: 1px solid {{ color }}40; box-shadow: 0 0 20px {{ color }}20;">
+                                {% if pred_val == 1 %} <i class="fa-solid fa-circle-check"></i> {% else %} <i class="fa-solid fa-triangle-exclamation"></i> {% endif %}
+                                {{ prediction_text }}
+                            </div>
+
+                            <div class="chart-wrapper">
+                                <canvas id="confidenceChart"></canvas>
+                                <div class="chart-center-text">
+                                    <h2 id="chartValue">0%</h2>
+                                    <span>Confidence</span>
+                                </div>
+                            </div>
+
+                            <p style="color: #cbd5e1; font-size: 15px; line-height: 1.6; margin-top: 20px; padding-top: 25px; border-top: 1px solid var(--glass-border); max-width: 80%;">
+                                <strong>Assessment Note:</strong> {{ status_msg }} The Random Forest model evaluated the applicant's credit history against debt-to-income ratios derived from the requested loan amount.
+                            </p>
+
+                            <script>
+                                const confScore = {{ confidence }};
+                                const hexColor = "{{ color }}";
+                                
+                                let current = 0;
+                                const valEl = document.getElementById('chartValue');
+                                const counter = setInterval(() => {
+                                    current += (confScore / 50);
+                                    if(current >= confScore) { current = confScore; clearInterval(counter); }
+                                    valEl.innerText = Math.round(current) + "%";
+                                }, 20);
+
+                                const ctx = document.getElementById('confidenceChart').getContext('2d');
+                                new Chart(ctx, {
+                                    type: 'doughnut',
+                                    data: {
+                                        labels: ['AI Confidence', 'Uncertainty'],
+                                        datasets: [{
+                                            data: [confScore, 100 - confScore],
+                                            backgroundColor: [hexColor, 'rgba(255,255,255,0.05)'],
+                                            borderWidth: 0,
+                                            borderRadius: [15, 0] 
+                                        }]
+                                    },
+                                    options: { cutout: '88%', plugins: { legend: { display: false }, tooltip: { enabled: false } }, animation: { animateScale: true, duration: 1500, easing: 'easeOutQuart' } }
+                                });
+                            </script>
+
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fa-solid fa-microchip"></i>
+                                <h3 style="margin: 0; color: white; font-size: 22px;">Awaiting Parameters</h3>
+                                <p style="margin: 0; font-size: 15px; max-width: 250px; line-height: 1.6;">Submit the applicant data on the left to generate a live risk analysis and confidence chart.</p>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
